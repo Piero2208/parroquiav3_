@@ -1,5 +1,5 @@
 // parroquia-frontend/src/pages/Security/User.js
-import React, { useState } from 'react';
+import React, { useState, useMemo  } from 'react';
 import { motion } from 'framer-motion';
 import { Users, Plus, Search, Edit, Trash2, Shield, Loader, Eye, EyeOff } from 'lucide-react';
 import PageHeader from '../../components/Common/PageHeader';
@@ -66,6 +66,37 @@ const UsersPage = () => {
         setSelectedUser(user);
         setIsModalOpen(true);
     };
+    // Memorizar initialValues para evitar que cambie la referencia en cada render
+    const memoizedInitialValues = useMemo(() => {
+        if (selectedUser) {
+            return {
+                name: selectedUser.name || '',
+                email: selectedUser.email || '',
+                role: typeof selectedUser.role === 'object' ? (selectedUser.role.name || 'user') : (selectedUser.role || 'user'),
+                password: '',
+                confirmPassword: '',
+                per_nombres: selectedUser.persona?.per_nombres || selectedUser.name || '',
+                per_apellidos: selectedUser.persona?.per_apellidos || '',
+                per_domicilio: selectedUser.persona?.per_domicilio || '',
+                per_telefono: selectedUser.persona?.per_telefono || '',
+                fecha_nacimiento: selectedUser.persona?.fecha_nacimiento || '',
+                parroquiaid: selectedUser.persona?.parroquiaid || ''
+            };
+        }
+        return {
+            name: '', 
+            email: '', 
+            role: 'user', 
+            password: '', 
+            confirmPassword: '', 
+            per_nombres: '', 
+            per_apellidos: '', 
+            per_domicilio: '', 
+            per_telefono: '', 
+            fecha_nacimiento: '', 
+            parroquiaid: ''
+        };
+    }, [selectedUser]);
 
     // Crear usuario
     const handleCreateUser = async (userData) => {
@@ -261,21 +292,22 @@ const UsersPage = () => {
                 mode={modalMode}
                 title={modalMode === 'add' ? 'Nuevo Usuario' : modalMode === 'edit' ? 'Editar Usuario' : 'Información del Usuario'}
                 icon={Users}
-                initialValues={selectedUser ? {
-                    name: selectedUser.name || '',
-                    email: selectedUser.email || '',
-                    role: typeof selectedUser.role === 'object' ? (selectedUser.role.name || 'user') : (selectedUser.role || 'user'),
-                    password: '',
-                    confirmPassword: '',
-                    per_nombres: selectedUser.persona?.per_nombres || selectedUser.name || '',
-                    per_apellidos: selectedUser.persona?.per_apellidos || '',
-                    per_domicilio: selectedUser.persona?.per_domicilio || '',
-                    per_telefono: selectedUser.persona?.per_telefono || '',
-                    fecha_nacimiento: selectedUser.persona?.fecha_nacimiento || '',
-                    parroquiaid: selectedUser.persona?.parroquiaid || ''
-                } : {
-                    name: '', email: '', role: 'user', password: '', confirmPassword: '', per_nombres: '', per_apellidos: '', per_domicilio: '', per_telefono: '', fecha_nacimiento: '', parroquiaid: ''
-                }}
+                initialValues={memoizedInitialValues} // <-- Usar el valor memorizado
+                // initialValues={selectedUser ? {
+                //     name: selectedUser.name || '',
+                //     email: selectedUser.email || '',
+                //     role: typeof selectedUser.role === 'object' ? (selectedUser.role.name || 'user') : (selectedUser.role || 'user'),
+                //     password: '',
+                //     confirmPassword: '',
+                //     per_nombres: selectedUser.persona?.per_nombres || selectedUser.name || '',
+                //     per_apellidos: selectedUser.persona?.per_apellidos || '',
+                //     per_domicilio: selectedUser.persona?.per_domicilio || '',
+                //     per_telefono: selectedUser.persona?.per_telefono || '',
+                //     fecha_nacimiento: selectedUser.persona?.fecha_nacimiento || '',
+                //     parroquiaid: selectedUser.persona?.parroquiaid || ''
+                // } : {
+                //     name: '', email: '', role: 'user', password: '', confirmPassword: '', per_nombres: '', per_apellidos: '', per_domicilio: '', per_telefono: '', fecha_nacimiento: '', parroquiaid: ''
+                // }}
                 fields={[
                     { name: 'name', label: 'Nombre de usuario o alias *', type: 'text' },
                     { name: 'email', label: 'Correo electrónico *', type: 'email' },
